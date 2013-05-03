@@ -1,0 +1,21 @@
+.icon {
+    width: 40px;
+    height: 40px;
+    background-image: url('img/icons.png');
+}
+.icon:hover {
+    background-image: url('img/icons-hover.png');
+}
+
+.icon1 {
+    background-position: 0 0;
+}
+.icon2 {
+    background-position: 40px 0;
+}
+.icon3 {
+    background-position: 0 40px;
+}
+.icon4 {
+    background-position: 40px 40px;
+}
