@@ -49,8 +49,7 @@
         this._defaults = defaults;
         this._name = pluginName;
         this._is_visible = false;
-        this._buttonsClick = [];
-        this._buttonsDblClick = [];
+        this._buttonCollections = {};
 
         this.init();
     }
@@ -72,20 +71,20 @@
                 clicks++;  //count clicks
                 if(clicks === 1) {
                     timer = setTimeout(function() {
-                        that.onClick.call(that, event);
+                        that.onEvent.call(that, event, 'click');
                         clicks = 0;             //after action performed, reset counter
 
                     }, DELAY);
 
                 } else {
                     clearTimeout(timer);    //prevent single-click action
-                    that.onDblClick.call(that, event);
+                    that.onEvent.call(that, event, 'dblclick');
                     clicks = 0;             //after action performed, reset counter
                 }
 
                 return false
             })
-            .on("dblclick", function(e){
+            .on("dblclick", function(e) {
                 e.preventDefault();  //cancel system double-click event
             });
         },
@@ -103,13 +102,11 @@
 
             return elt;
         },
-        registerClick: function(options) {
-            this._buttonsClick.push(this._createElement(options));
+        register: function(eventType, options) {
+            this._buttonCollections[eventType] = this._buttonCollections[eventType] || [];
+            this._buttonCollections[eventType].push(this._createElement(options));
         },
-        registerDblClick: function(options) {
-            this._buttonsDblClick.push(this._createElement(options));
-        },
-        onClick: function(event) {
+        onEvent: function(event, eventType) {
             var x = event.offsetX,
                 y = event.offsetY;
 
@@ -119,20 +116,7 @@
                 this.show({
                     x: relativeOffset(event).left, 
                     y: relativeOffset(event).top
-                }, this._buttonsClick);   
-            };
-        },
-        onDblClick: function(event) {
-            var x = event.offsetX,
-                y = event.offsetY;
-
-            if (this._is_visible) {
-                this.hide();
-            } else {
-                this.show({
-                    x: relativeOffset(event).left, 
-                    y: relativeOffset(event).top
-                }, this._buttonsDblClick);   
+                }, this._buttonCollections[eventType]);   
             };
         },
         show: function(options, register) {
@@ -165,19 +149,6 @@
             $('.icon').detach();
         }
     };
-
-    // A really lightweight plugin wrapper around the constructor,
-    // preventing against multiple instantiations
-    //$.fn[pluginName] = function (options) {
-        //return this.each(function () {
-            //if (!$.data(this, "plugin_" + pluginName)) {
-                //$.data(this, "plugin_" + pluginName, new Plugin(this, options));
-            //}
-        //});
-    //};
-
-
-
 
     // You don't need to change something below:
     // A really lightweight plugin wrapper around the constructor,
@@ -239,8 +210,4 @@
             return returns !== undefined ? returns : this;
         }
     };
-
-
-
-
 })(jQuery, window, document);
