@@ -82,6 +82,8 @@
                     that.onDblClick.call(that, event);
                     clicks = 0;             //after action performed, reset counter
                 }
+
+                return false
             })
             .on("dblclick", function(e){
                 e.preventDefault();  //cancel system double-click event
@@ -96,6 +98,7 @@
             .on('click', function(event) {
                 options.onclick(event);
                 that.hide();
+                return false;
             });
 
             return elt;
