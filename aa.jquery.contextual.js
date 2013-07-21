@@ -33,7 +33,8 @@
     // Create the defaults once
     var pluginName = "contextual",
         defaults = {
-            propertyName: "value"
+            iconSize: 40,
+            iconSpacing: 5,
         };
 
     // The actual plugin constructor
@@ -67,13 +68,13 @@
             var DELAY = 300, clicks = 0, timer = null;
             var that = this;
 
-            $(this.element).on("click", function(event){
+            $(this.element)
+            .on("click", function(event) {
                 clicks++;  //count clicks
-                if(clicks === 1) {
+                if (clicks === 1) {
                     timer = setTimeout(function() {
                         that.onEvent.call(that, event, 'click');
                         clicks = 0;             //after action performed, reset counter
-
                     }, DELAY);
 
                 } else {
@@ -84,8 +85,8 @@
 
                 return false
             })
-            .on("dblclick", function(e) {
-                e.preventDefault();  //cancel system double-click event
+            .on("dblclick", function(event) {
+                event.preventDefault();  //cancel system double-click event
             });
         },
         _createElement: function(options) {
@@ -119,27 +120,31 @@
                 }, this._buttonCollections[eventType]);   
             };
         },
-        show: function(options, register) {
-            var number = register.length,  // the number of menu entries to show 
-                cols = Math.ceil(Math.sqrt(number));
-
-            var left = options.x - (cols * 45) / 2;
-            var top = options.y - (Math.floor(Math.sqrt(number)) * 45) / 2
+        show: function(options, buttonCollection) {
+            var number = buttonCollection.length,  // the number of menu entries to show 
+                cols = Math.ceil(Math.sqrt(number)),
+                iconSize = this.options.iconSize,
+                iconSpacing = this.options.iconSpacing,
+                cumulatedSize = iconSize + iconSpacing,
+                left = options.x - (cols * cumulatedSize) / 2,
+                top = options.y - (Math.floor(Math.sqrt(number)) * cumulatedSize) / 2;
 
             this._is_visible = true;
 
             console.log('show', options);
 
             for (var i=0; i<number; i++) {
-                var elt = register[i];
-                elt.css({
-                    position: 'absolute',
-                    left: options.x - 20, 
-                    top: options.y - 20
-                }).animate({
-                    left: left + (45 * (i % cols)), 
-                    top: top + (45 * parseInt(i / cols))
-                }, 200).appendTo('body');
+                buttonCollection[i]
+                .css({
+                    position : 'absolute',
+                    left     :  options.x - (iconSize / 2), 
+                    top      :  options.y - (iconSize / 2)
+                })
+                .animate({
+                    left: left + (cumulatedSize * (i % cols)), 
+                    top: top + (cumulatedSize * parseInt(i / cols))
+                }, 200)
+                .appendTo('body');
             };
         },
         hide: function() {

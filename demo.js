@@ -1,7 +1,8 @@
 $(function() {
     $('#canvas')
     .contextual({
-        propertyName: 'a custom value'
+        iconSize: 40,
+        iconSpacing: 5
     })
     .contextual('register', 'click', {
         class: 'icon icon4',
