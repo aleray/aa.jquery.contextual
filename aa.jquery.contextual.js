@@ -30,6 +30,7 @@
         };
     };
 
+
     // Create the defaults once
     var pluginName = "contextual",
         defaults = {
@@ -96,59 +97,118 @@
             .addClass(options.class)
             .attr('title', options.title)
             .on('click', function(event) {
-                options.onclick(event);
-                that.hide();
+                options.onclick.call(that, event);
+
                 return false;
             });
 
             return elt;
         },
-        register: function(eventType, options) {
+        register: function(eventType, location, options) {
             this._buttonCollections[eventType] = this._buttonCollections[eventType] || [];
-            this._buttonCollections[eventType].push(this._createElement(options));
+            this._buttonCollections[eventType][location] = this._buttonCollections[eventType][location] || [];
+            this._buttonCollections[eventType][location].push(this._createElement(options));
         },
         onEvent: function(event, eventType) {
-            var x = event.offsetX,
-                y = event.offsetY;
-
             if (this._is_visible) {
                 this.hide();
             } else {
-                this.show({
-                    x: relativeOffset(event).left, 
-                    y: relativeOffset(event).top
-                }, this._buttonCollections[eventType]);   
+                console.log('show');
+                this.showAtClick(event, this._buttonCollections[eventType]['click']);
+                this.showOnTop(event, this._buttonCollections[eventType]['top']);
+                this.showOnTheLeft(event, this._buttonCollections[eventType]['left']);
+                this._is_visible = true;
             };
         },
-        show: function(options, buttonCollection) {
-            var number = buttonCollection.length,  // the number of menu entries to show 
+        showAtClick: function(event, buttonCollection) {
+             if (!buttonCollection) {
+                return;
+             };
+
+            // the number of menu entries to show
+            var number = buttonCollection.length, 
+
+            // the relative offset of the click event
+                clickX = relativeOffset(event).left, 
+                clickY = relativeOffset(event).top,
+
+            // the number of columns of our grid
                 cols = Math.ceil(Math.sqrt(number)),
+
+            // some shortcuts, and the size of an icon + the gutter
                 iconSize = this.options.iconSize,
                 iconSpacing = this.options.iconSpacing,
                 cumulatedSize = iconSize + iconSpacing,
-                left = options.x - (cols * cumulatedSize) / 2,
-                top = options.y - (Math.floor(Math.sqrt(number)) * cumulatedSize) / 2;
 
-            this._is_visible = true;
+            // where to start the grid
+                origin = {
+                    left: clickX - (cols * cumulatedSize) / 2,
+                    top: clickY - (Math.floor(Math.sqrt(number)) * cumulatedSize) / 2
+                };
 
-            console.log('show', options);
+            for (var i=0; i<number; i++) {
+                buttonCollection[i]
+                // sets the initial position of the icon to the location of the click event
+                .css({
+                    position : 'absolute',
+                    left     :  clickX - (iconSize / 2), 
+                    top      :  clickY - (iconSize / 2)
+                })
+                // sets the target position on the grid, with animation
+                .animate({
+                    left: origin.left + (cumulatedSize * (i % cols)), 
+                    top: origin.top + (cumulatedSize * parseInt(i / cols))
+                }, 200)
+                .appendTo('body');
+            };
+        },
+        showOnTheLeft: function(event, buttonCollection) {
+            if (!buttonCollection) {
+               return;
+            };
+
+            var number = buttonCollection.length;
+            
+            // where to start the grid
+            var origin = {
+                left: $(event.target).position().left - 45,
+                top: $(event.target).position().top
+            };
 
             for (var i=0; i<number; i++) {
                 buttonCollection[i]
                 .css({
                     position : 'absolute',
-                    left     :  options.x - (iconSize / 2), 
-                    top      :  options.y - (iconSize / 2)
+                    left     :  origin.left, 
+                    top      :  origin.top + (i * 45)
                 })
-                .animate({
-                    left: left + (cumulatedSize * (i % cols)), 
-                    top: top + (cumulatedSize * parseInt(i / cols))
-                }, 200)
+                .appendTo('body');
+            };
+        },
+        showOnTop: function(event, buttonCollection) {
+            if (!buttonCollection) {
+               return;
+            };
+
+            var number = buttonCollection.length;
+            
+            // where to start the grid
+            var origin = {
+                left: $(event.target).position().left,
+                top: $(event.target).position().top - 45
+            };
+
+            for (var i=0; i<number; i++) {
+                buttonCollection[i]
+                .css({
+                    position : 'absolute',
+                    left     :  origin.left + (i * 45), 
+                    top      :  origin.top
+                })
                 .appendTo('body');
             };
         },
         hide: function() {
-            // some logic
             console.log('hide');
             this._is_visible = false;
             $('.icon').detach();
