@@ -90,24 +90,10 @@
                 event.preventDefault();  //cancel system double-click event
             });
         },
-        _createElement: function(options) {
-            var that = this;
-
-            var elt = $('<div>')
-            .addClass(options.class)
-            .attr('title', options.title)
-            .on('click', function(event) {
-                options.onclick.call(that, event);
-
-                return false;
-            });
-
-            return elt;
-        },
-        register: function(eventType, location, options) {
+        register: function(eventType, location, elt) {
             this._buttonCollections[eventType] = this._buttonCollections[eventType] || [];
             this._buttonCollections[eventType][location] = this._buttonCollections[eventType][location] || [];
-            this._buttonCollections[eventType][location].push(this._createElement(options));
+            this._buttonCollections[eventType][location].push(elt);
         },
         onEvent: function(event, eventType) {
             if (this._is_visible) {
