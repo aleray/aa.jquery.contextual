@@ -15,7 +15,7 @@ $(function() {
 
         })
         .on('click', function(event) {
-            $("#canvas").toggleClass('grid');
+            $("#canvas").grid();
 
             return false;
         });
@@ -24,19 +24,6 @@ $(function() {
     })();
 
     (function() {
-        var tpl = _.template($('#background-image-template').html());
-        var grid = function(width, height, hgutter, vgutter) {
-            return {
-                'background-size': (width + hgutter) + 'px ' + (height + vgutter) + 'px ',
-                'background-image': tpl({
-                    width: width, 
-                    hgutter: hgutter, 
-                    height: height, 
-                    vgutter: vgutter
-                })
-            };
-        };
-
         var btn = $('<div>')
         .attr({
             title: 'hello world!',
@@ -47,16 +34,18 @@ $(function() {
         .on('mousedown', function(event) {
             var that = this;
             var obj = $("#canvas");
-            var bgSize = obj.css("background-size");
-            var oy = parseInt(bgSize.split(', ')[0]);
-            var ox = parseInt(bgSize.split(', ')[1]);
-
-            console.log(ox, oy);
+            var oy = obj.grid('height');
+            var ox = obj.grid('width');
+            var hg = obj.grid('hgutter');
+            var vg = obj.grid('vgutter');
 
             slider(event, function(x, y) {
-                var y = (oy + y);
-                var x = (ox + x);
-                obj.css(grid(x, y, 5, 5));
+                console.log(event.ctrlKey);
+                if (event.ctrlKey) {
+                    obj.grid('update', {hgutter: hg + x, vgutter: vg + y});
+                } else {
+                    obj.grid('update', {width: ox + x, height: oy + y});
+                };
             }, function(x, y) {
             });
 
