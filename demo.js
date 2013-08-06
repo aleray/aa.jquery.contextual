@@ -7,6 +7,9 @@ $(function() {
 
 
     (function() {
+        // initialises the grid on the canvas element
+        $("#canvas").grid({visible: false});
+
         var btn = $('<div>')
         .attr({
             title: 'hello world!',
@@ -15,8 +18,7 @@ $(function() {
 
         })
         .on('click', function(event) {
-            $("#canvas").grid();
-
+            $("#canvas").grid('toggle');
             return false;
         });
 
@@ -42,9 +44,17 @@ $(function() {
             slider(event, function(x, y) {
                 console.log(event.ctrlKey);
                 if (event.ctrlKey) {
-                    obj.grid('update', {hgutter: hg + x, vgutter: vg + y});
+                    hperiod = hg + x;
+                    hperiod = (hperiod < 0) ? 0 : hperiod;
+                    vperiod = vg + y;
+                    vperiod = (vperiod < 0) ? 0 : vperiod;
+                    obj.grid('update', {hgutter: hperiod, vgutter: vperiod});
                 } else {
-                    obj.grid('update', {width: ox + x, height: oy + y});
+                    hperiod = ox + x;
+                    hperiod = (hperiod < 5) ? 5 : hperiod;
+                    vperiod = oy + y;
+                    vperiod = (vperiod < 5) ? 5 : vperiod;
+                    obj.grid('update', {width: hperiod, height: vperiod});
                 };
             }, function(x, y) {
             });

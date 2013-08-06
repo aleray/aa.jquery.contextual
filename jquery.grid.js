@@ -19,7 +19,8 @@
             height: 40,
             hgutter: 5,
             vgutter: 5,
-            color: 'cyan'
+            color: 'cyan',
+            gutterColor: 'rgba(255, 0, 0, 0.25)'
         };
 
     // The actual plugin constructor
@@ -39,8 +40,17 @@
     }
 
     Plugin.prototype = {
-        _update: function() {
+        toggle: function() {
+            if (this.options.visible) {
+                this.hide();
+            } else {
+                this.show();
+            };
+
+        },
+        show: function() {
             var o = this.options;
+            o.visible = true;
 
             $(this.element).css({
                 'background-size': this._backgroundSizeTemplate(this.options),
@@ -54,28 +64,48 @@
             // and this.options
             // you can add more functions like the one below and
             // call them like so: this.yourOtherFunction(this.element, this.options).
-            this._backgroundSizeTemplate = _.template('<%= width + hgutter %>px <%= height + vgutter %>px');
+            this._backgroundSizeTemplate = _.template('<%= width %>px <%= height %>px');
             this._backgroundImageTemplate = _.template(''
             + '-webkit-linear-gradient('
             + '    left, '
-            + '    transparent, '
-            + '    transparent <%= width - 1 %>px, '
-            + '    <%= color %> <%= width %>px, '
-            + '    transparent <%= width %>px, '
-            + '    transparent <%= width + hgutter - 1 %>px, '
-            + '    <%= color %> <%= width + hgutter %>px'
-            + '), '
+            + '    transparent 0px, ' 
+            + '    transparent <%= width - hgutter + 1 %>px, '
+            + '    <%= gutterColor %> <%= width - hgutter + 1 %>px, '
+            + '    <%= gutterColor %> <%= width %>px '
+            + '),'
             + '-webkit-linear-gradient('
             + '    top, '
-            + '    transparent, '
-            + '    transparent <%= height - 1 %>px, '
-            + '    <%= color %> <%= height %>px, '
-            + '    transparent <%= height %>px, '
-            + '    transparent <%= height + vgutter - 1 %>px, '
-            + '    <%= color %> <%= height + vgutter %>px'
+            + '    transparent 0px, ' 
+            + '    transparent <%= height - vgutter + 1 %>px, '
+            + '    <%= gutterColor %> <%= height - vgutter + 1 %>px, '
+            + '    <%= gutterColor %> <%= height %>px '
+            + '),'
+            + '-webkit-linear-gradient('
+            + '    left, '
+            + '    <%= color %> 0px, ' 
+            + '    <%= color %> 1px, '
+            + '    transparent 1px, '
+            + '    transparent <%= width - hgutter %>px, '
+            + '    <%= color %> <%= width - hgutter %>px, '
+            + '    <%= color %> <%= width - hgutter + 1 %>px, '
+            + '    transparent <%= width - hgutter + 1 %>px, '
+            + '    transparent <%= width %>px '
+            + '),'
+            + '-webkit-linear-gradient('
+            + '    top, '
+            + '    <%= color %> 0px, ' 
+            + '    <%= color %> 1px, '
+            + '    transparent 1px, '
+            + '    transparent <%= height - vgutter %>px, '
+            + '    <%= color %> <%= height - vgutter %>px, '
+            + '    <%= color %> <%= height - vgutter + 1 %>px, '
+            + '    transparent <%= height - vgutter + 1 %>px, '
+            + '    transparent <%= height %>px '
             + ')');
 
-            this._update();
+            if (this.options.visible) {
+                this.show();
+            };
         },
         updateRelative: function(options) {
             var o = this.options;
@@ -94,16 +124,16 @@
                 o.vgutter += n.vgutter;
             }
 
-            this._update();
+            this.show();
         },
         update: function(options) {
             this.options = $.extend({}, this.options, options);
-            this._update();
+            this.show();
         },
         hgutter: function(size) {
             if (size) {
                 this.options.hgutter = size;
-                this._update();
+                this.show();
             } else {
                 return this.options.hgutter;   
             };
@@ -111,7 +141,7 @@
         vgutter: function(size) {
             if (size) {
                 this.options.vgutter = size;
-                this._update();
+                this.show();
             } else {
                 return this.options.vgutter;   
             };
@@ -119,7 +149,7 @@
         width: function(size) {
             if (size) {
                 this.options.width = size;
-                this._update();
+                this.show();
             } else {
                 return this.options.width;   
             };
@@ -127,12 +157,13 @@
         height: function(size) {
             if (size) {
                 this.options.height = size;;
-                this._update();
+                this.show();
             } else {
                 return this.options.height;   
             };
         },
         hide: function() {
+            this.options.visible = false;
             $(this.element).css({
                 'background-size': 'auto',
                 'background-image': 'none'
