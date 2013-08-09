@@ -51,7 +51,11 @@
         this._defaults = defaults;
         this._name = pluginName;
         this._is_visible = false;
-        this._buttonCollections = {};
+        this._buttonCollections = {
+            click: [],
+            top: [],
+            left: []
+        };
 
         this.init();
     }
@@ -91,6 +95,10 @@
             });
         },
         register: function(eventType, location, elt) {
+            //if (!this._buttonCollections.hasOwnProperty(eventType)) {
+                //console.log('bad');
+                //return;
+            //};
             this._buttonCollections[eventType] = this._buttonCollections[eventType] || [];
             this._buttonCollections[eventType][location] = this._buttonCollections[eventType][location] || [];
             this._buttonCollections[eventType][location].push(elt);
@@ -156,17 +164,15 @@
             var number = buttonCollection.length;
             
             // where to start the grid
-            var origin = {
-                left: $(event.target).position().left - 45,
-                top: $(event.target).position().top
-            };
+            var origin = $(event.currentTarget).offset();
+            origin.left -= this.options.iconSize + this.options.iconSpacing;
 
             for (var i=0; i<number; i++) {
                 buttonCollection[i]
                 .css({
                     position : 'absolute',
                     left     :  origin.left, 
-                    top      :  origin.top + (i * 45)
+                    top      :  origin.top + (i * (this.options.iconSize + this.options.iconSpacing))
                 })
                 .appendTo('body');
             };
@@ -179,16 +185,14 @@
             var number = buttonCollection.length;
             
             // where to start the grid
-            var origin = {
-                left: $(event.target).position().left,
-                top: $(event.target).position().top - 45
-            };
+            var origin = $(event.currentTarget).offset();
+            origin.top -= this.options.iconSize + this.options.iconSpacing;
 
             for (var i=0; i<number; i++) {
                 buttonCollection[i]
                 .css({
                     position : 'absolute',
-                    left     :  origin.left + (i * 45), 
+                    left     :  origin.left + (i * (this.options.iconSize + this.options.iconSpacing)), 
                     top      :  origin.top
                 })
                 .appendTo('body');

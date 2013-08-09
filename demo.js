@@ -100,7 +100,6 @@ $(function() {
             title: 'hello world!',
             draggable: false,
             class: 'icon icon4'
-
         })
         .on('mousedown', function(event) {
             var that = this;
