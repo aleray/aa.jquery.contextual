@@ -36,6 +36,7 @@
         defaults = {
             iconSize: 40,
             iconSpacing: 5,
+            onShow: null
         };
 
     // The actual plugin constructor
@@ -51,11 +52,8 @@
         this._defaults = defaults;
         this._name = pluginName;
         this._is_visible = false;
-        this._buttonCollections = {
-            click: [],
-            top: [],
-            left: []
-        };
+        this._buttonCollections = {};
+        this._visibleButtons = [];
 
         this.init();
     }
@@ -99,6 +97,16 @@
                 //console.log('bad');
                 //return;
             //};
+            if ($.inArray(location, ['cursor', 'top', 'left']) == -1) {
+                var msg = ""
+                    + "The location must be one of the following values: "
+                    + ['"cursor"', '"top"', '"left"'].join(', ')
+                    + " but you've passed \""
+                    + location
+                    + "\"";
+                throw new Error(msg)
+            };
+
             this._buttonCollections[eventType] = this._buttonCollections[eventType] || [];
             this._buttonCollections[eventType][location] = this._buttonCollections[eventType][location] || [];
             this._buttonCollections[eventType][location].push(elt);
@@ -108,16 +116,20 @@
                 this.hide();
             } else {
                 console.log('show');
-                this.showAtClick(event, this._buttonCollections[eventType]['click']);
+                this.showAtCursor(event, this._buttonCollections[eventType]['cursor']);
                 this.showOnTop(event, this._buttonCollections[eventType]['top']);
                 this.showOnTheLeft(event, this._buttonCollections[eventType]['left']);
                 this._is_visible = true;
+
+                if ($.isFunction(this.options.onShow)) {
+                    this.options.onShow.call(this)
+                };
             };
         },
-        showAtClick: function(event, buttonCollection) {
-             if (!buttonCollection) {
+        showAtCursor: function(event, buttonCollection) {
+            if (!buttonCollection) {
                 return;
-             };
+            };
 
             // the number of menu entries to show
             var number = buttonCollection.length, 
@@ -141,7 +153,7 @@
                 };
 
             for (var i=0; i<number; i++) {
-                buttonCollection[i]
+                var btn = buttonCollection[i]
                 // sets the initial position of the icon to the location of the click event
                 .css({
                     position : 'absolute',
@@ -154,6 +166,8 @@
                     top: origin.top + (cumulatedSize * parseInt(i / cols))
                 }, 200)
                 .appendTo('body');
+
+                this._visibleButtons.push(btn);
             };
         },
         showOnTheLeft: function(event, buttonCollection) {
@@ -168,13 +182,15 @@
             origin.left -= this.options.iconSize + this.options.iconSpacing;
 
             for (var i=0; i<number; i++) {
-                buttonCollection[i]
+                var btn = buttonCollection[i]
                 .css({
                     position : 'absolute',
                     left     :  origin.left, 
                     top      :  origin.top + (i * (this.options.iconSize + this.options.iconSpacing))
                 })
                 .appendTo('body');
+
+                this._visibleButtons.push(btn);
             };
         },
         showOnTop: function(event, buttonCollection) {
@@ -189,19 +205,26 @@
             origin.top -= this.options.iconSize + this.options.iconSpacing;
 
             for (var i=0; i<number; i++) {
-                buttonCollection[i]
+                var btn = buttonCollection[i]
                 .css({
                     position : 'absolute',
                     left     :  origin.left + (i * (this.options.iconSize + this.options.iconSpacing)), 
                     top      :  origin.top
                 })
                 .appendTo('body');
+
+                this._visibleButtons.push(btn);
             };
         },
         hide: function() {
             console.log('hide');
+            $.each(this._visibleButtons, function(index, value) {
+                value.detach();
+            });
+            this._visibleButtons = [];
             this._is_visible = false;
-            $('.icon').detach();
+
+            //$('.icon').detach();
         }
     };
 

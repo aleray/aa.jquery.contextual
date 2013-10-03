@@ -2,7 +2,10 @@ $(function() {
     var obj = $('#canvas')
     .contextual({
         iconSize: 40,
-        iconSpacing: 5
+        iconSpacing: 5,
+        onShow: function() {
+            console.log(this);
+        }
     });
 
 
@@ -22,7 +25,7 @@ $(function() {
             return false;
         });
 
-        obj.contextual('register', 'click', 'click', btn);
+        obj.contextual('register', 'click', 'cursor', btn);
     })();
 
     (function() {
@@ -62,7 +65,7 @@ $(function() {
             return false;
         });
 
-        obj.contextual('register', 'click', 'click', btn);
+        obj.contextual('register', 'click', 'cursor', btn);
     })();
 
     (function() {
@@ -91,7 +94,7 @@ $(function() {
             return false;
         });
 
-        obj.contextual('register', 'click', 'click', btn);
+        obj.contextual('register', 'click', 'cursor', btn);
     })();
 
     (function() {
@@ -119,7 +122,7 @@ $(function() {
             return false;
         });
 
-        obj.contextual('register', 'click', 'click', btn);
+        obj.contextual('register', 'click', 'cursor', btn);
     })();
 
 
