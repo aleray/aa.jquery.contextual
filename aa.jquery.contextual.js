@@ -115,7 +115,9 @@
             if (this._is_visible) {
                 this.hide();
             } else {
-                console.log('show');
+                // prevents "Uncaught TypeError: Cannot read property 'cursor' of undefined"
+                if (!this._buttonCollections[eventType]) { return; };
+
                 this.showAtCursor(event, this._buttonCollections[eventType]['cursor']);
                 this.showOnTop(event, this._buttonCollections[eventType]['top']);
                 this.showOnTheLeft(event, this._buttonCollections[eventType]['left']);
@@ -217,7 +219,6 @@
             };
         },
         hide: function() {
-            console.log('hide');
             $.each(this._visibleButtons, function(index, value) {
                 value.detach();
             });
